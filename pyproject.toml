@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "app"
+version = "0.1.0"
+description = ""
+authors = ["anonymous"]
+
+[tool.poetry.scripts]
+main = "app.main:main"
+typecheck = "app.tasks:typecheck"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+tomlkit = "^0.11.6"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^0.991"
+isort = "^5.12.0"
+black = "^22.12.0"
+typing-extensions = "^4.4.0"
+
+[tool.black]
+line-length = 80
+
+[tool.isort]
+profile = "black"
+combine_as_imports = true
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

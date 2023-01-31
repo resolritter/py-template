@@ -1,0 +1,56 @@
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+name: CI
+
+env:
+  PYTHON_VERSION: 3.10.6
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up Python usage
+        run: |
+          echo "$pythonLocation/bin" >> "$GITHUB_PATH"
+          PY_SITE_PACKAGES="$(find "$pythonLocation" -type d -name site-packages -prune | paste -sd :)"
+          echo "PYTHONPATH=$PY_SITE_PACKAGES" >> "$GITHUB_ENV"
+          echo "PIP_CACHE_DIR=$(pip cache dir)" >> "$GITHUB_ENV"
+
+      - name: Set up caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pre-commit
+            .venv
+            ${{ env.PIP_CACHE_DIR }}
+          key: pre-commit+${{ env.PYTHON_VERSION }}+${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Install dependencies
+        run: |
+          pip install pre-commit
+          pip install poetry
+
+      - name: Set up dependencies
+        run: |
+          poetry export --without-hashes --format=requirements.txt > requirements.txt
+          poetry export --with dev --without-hashes --format=requirements.txt >> requirements.txt
+          pip install -r requirements.txt
+
+      - name: Run linters
+        run: pre-commit run --color=always --all
+
+      - name: Run typechecking
+        run: poetry run typecheck

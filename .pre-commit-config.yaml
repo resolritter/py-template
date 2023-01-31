@@ -1,0 +1,27 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      - id: check-yaml
+      - id: check-toml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+  - repo: local
+    hooks:
+      - id: isort
+        name: isort
+        entry: isort
+        files: \.(py)$
+        language: system
+        args: ["--check"]
+      - id: black
+        name: black
+        entry: black
+        files: \.(py)$
+        language: system
+        args: ["--check"]
+      - id: mypy
+        name: mypy
+        entry: mypy
+        language: system
+        files: \.(py)$
